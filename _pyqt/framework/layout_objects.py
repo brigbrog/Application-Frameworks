@@ -25,36 +25,39 @@ from PyQt6.QtWidgets import (
 	)
 
 
-
+# fear not
 
 class Window(QMainWindow):
 	def __init__(self):
-
 		super().__init__(parent=None)
-		self.setWindowTitle("QMainWindow")
-		self.setCentralWidget(QLabel("Central Widget"))
-		
-		#self._createImageViewer()
 
-		self._createMenu()
-		#self._createToolBar()
-		self._createStatusBar()
-		#self._createFunctionBar()
+		self.resize(1000, 800)
+		self.setWindowTitle("QMainWindow")
 		
-		
+		# initialize the interface
+		self._init_ui()
+
+
+	def _init_ui(self):
+		pass
+
 
 	def _createMenu(self):
-		menu = self.menuBar().addMenu("&Menu")
-		menu.addAction("&Exit", self.close)          # "Exit" action
+		menubar = self.menuBar()
+		menubar.setNativeMenuBar(False)
+		file_menu = menubar.addMenu("&Menu")
+		file_menu.addAction("&Exit", self.close)
+		# other menu actions
+
 		
 	def _createToolBar(self):
 		tools = QToolBar()
 		tools.addAction("Exit", self.close)
 		self.addToolBar(tools)
 		
-	def _createStatusBar(self):
+	def _createStatusBar(self, message = "Status Bar"):
 		status = QStatusBar()
-		status.showMessage("Status Bar")
+		status.showMessage(message)
 		self.setStatusBar(status)
 
 	def _createFunctionBar(self):
@@ -63,51 +66,72 @@ class Window(QMainWindow):
 
 
 class ImageWindow(Window):
-	def __init__(self):
-		super().__init__()
+	def __init__(self, windowTitle="Image Viewer"):
+		super().__init__() 
+		self.setWindowTitle(windowTitle)
+		self.scene = None 
 
-		self.resize(1000, 800)
-		self.setWindowTitle("Image Viewer")
 
+	def _init_ui(self):
+	
 		self.graphicsView = QGraphicsView()
 		self.setCentralWidget(self.graphicsView)
-
-		self.scene = None
 		self._createImageToolBar()
+		self._createStatusBar(message="status")
 
 
 	def _createImageToolBar(self):
-		functions = QToolBar()
-		functions.addAction("LOAD IMAGE", self._loadImage)
 
-		# add more functions
+		functions = QToolBar()
+
+		# add methods actions in subclass override like this: 
+		functions.addAction("LOAD IMAGE", self._loadImage)
+		functions.addAction("EXPORT IMAGE", self._exportImage)
+
+		# add functions to the toolbar
 		self.addToolBar(Qt.ToolBarArea.LeftToolBarArea, functions)
 
 
 	def _loadImage(self):
-		fpath, _ = QFileDialog.getOpenFileName(
-				self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)"
-			)
-		if not fpath:
-			return
+		# Override with subclass implementation
+		pass
+		# fpath, _ = QFileDialog.getOpenFileName(
+		# 		self, "Select Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)"
+		# 	)
+		# if not fpath:
+		# 	return
 
-		image_pil = Image.open(fpath)
-		image_pil = image_pil.convert("L")
+		# image_pil = Image.open(fpath)
+		# image_pil = image_pil.convert("L")
 
-		im_data = image_pil.tobytes("raw", "L")
-		qimage = QImage(
-			im_data, 
-			image_pil.width, 
-			image_pil.height, 
-			image_pil.width, 
-			QImage.Format.Format_Grayscale8
-		)
+		# im_data = image_pil.tobytes("raw", "L")
+		# qimage = QImage(
+		# 	im_data, 
+		# 	image_pil.width,
+		# 	image_pil.height, 
+		# 	image_pil.width, 
+		# 	QImage.Format.Format_Grayscale8
+		# )
 
-		pixmap = QPixmap.fromImage(qimage)
-		self.reload_canvas(pixmap)
+		# pixmap = QPixmap.fromImage(qimage)
+		# self._reload_canvas(pixmap)
 
 
-	def reload_canvas(self, pixmap: QPixmap):
+	def _exportImage(self):
+		# Override with subclass implementation		
+		pass
+		# if not self.scene:
+		# 	print("VOID SCENE") # <----------------------- SEND TO STATUS
+		# 	return None
+		
+		# fpath, _ = QFileDialog.getSaveFileName(
+		# 		self, "Select Save Location", "", ""
+		# 	)
+		# if not fpath:
+		# 	return
+
+
+	def _reload_canvas(self, pixmap: QPixmap):
 		if self.scene is None:
 			self.scene = QGraphicsScene(self)
 			self.graphicsView.setScene(self.scene)
